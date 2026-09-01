@@ -24,3 +24,9 @@ Thumbs.db
 
 # Node tooling cache/dependencies
 /node_modules/
+
+# QR batch generator working files
+/input.txt
+/output/
+/apps/qr-batch-generator/input.txt
+/apps/qr-batch-generator/output/

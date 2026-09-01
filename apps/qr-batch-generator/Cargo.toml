@@ -1,0 +1,13 @@
+[package]
+name = "qr-batch-generator"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+anyhow.workspace = true
+pc-name.workspace = true
+qrcode = "0.12"
+image = "0.23"
+imageproc = "0.22"
+rusttype = "0.9"

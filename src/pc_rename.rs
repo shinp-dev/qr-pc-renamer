@@ -1,4 +1,4 @@
-use anyhow::{bail, Result};
+use anyhow::Result;
 
 /// 現在のコンピュータ名（NetBIOS ホスト名）を返す
 pub fn get_current_name() -> Result<String> {
@@ -34,7 +34,7 @@ pub fn get_current_name() -> Result<String> {
 /// 管理者権限が必要です。
 /// `ComputerNamePhysicalDnsHostname = 5` を使用し、DNS + NetBIOS 両方に反映します。
 pub fn set_computer_name(new_name: &str) -> Result<()> {
-    validate_name(new_name)?;
+    pc_name::validate(new_name)?;
 
     #[cfg(target_os = "windows")]
     {
@@ -58,60 +58,5 @@ pub fn set_computer_name(new_name: &str) -> Result<()> {
             new_name
         );
         Ok(())
-    }
-}
-
-/// NetBIOS 名として許可される文字か検証する（最大 15 文字、英数字とハイフン）
-fn validate_name(name: &str) -> Result<()> {
-    if name.is_empty() {
-        bail!("PC 名が空です");
-    }
-    if name.len() > 15 {
-        bail!(
-            "PC 名は 15 文字以内にしてください（現在: {} 文字）",
-            name.len()
-        );
-    }
-    for ch in name.chars() {
-        if !ch.is_ascii_alphanumeric() && ch != '-' {
-            bail!(
-                "PC 名に使用できない文字が含まれています: '{}'\n（英数字とハイフンのみ使用可）",
-                ch
-            );
-        }
-    }
-    if !name.chars().any(|ch| ch.is_ascii_alphabetic()) {
-        bail!("PC 名には英字を 1 文字以上含めてください");
-    }
-    if name.starts_with('-') || name.ends_with('-') {
-        bail!("PC 名の先頭・末尾にハイフンは使用できません");
-    }
-    Ok(())
-}
-
-#[cfg(test)]
-mod tests {
-    use super::validate_name;
-
-    #[test]
-    fn accepts_valid_pc_names() {
-        for name in ["PC-001", "ROOM-A12", "A", "PC1234567890123"] {
-            assert!(validate_name(name).is_ok(), "{name} should be valid");
-        }
-    }
-
-    #[test]
-    fn rejects_invalid_pc_names() {
-        for name in [
-            "",
-            "12345",
-            "-PC001",
-            "PC001-",
-            "PC_001",
-            "PC NAME",
-            "PC12345678901234",
-        ] {
-            assert!(validate_name(name).is_err(), "{name} should be invalid");
-        }
     }
 }
