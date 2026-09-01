@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="QRコードまたは手入力で、実習室のWindows PC名をすばやく変更できる軽量ツールです。">
+  <title>PC名変更｜実習室向けWindowsツール</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="PC名変更 トップ">PC名変更</a>
+    <a class="header-link" href="#how-to">使い方</a>
+  </header>
+
+  <main id="top">
+    <section class="hero section-wrap">
+      <div class="hero-copy">
+        <p class="eyebrow">実習室・教室のPC管理に</p>
+        <h1>PC名の変更を、<br><span>もっと手早く。</span></h1>
+        <p class="lead">QRコードを読み取るだけで、Windows PCのコンピュータ名を変更できます。手入力にも対応した、管理作業向けのシンプルなツールです。</p>
+        <div class="hero-actions">
+          <a class="button button-dark" href="../run_renamer_qr.bat" download>配布ファイルをダウンロード</a>
+          <a class="text-link" href="#how-to">使い方を見る <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+      <div class="hero-art" aria-label="PC名変更アイコン">
+        <img src="assets/pc-renamer-icon-lp.png" alt="PC名変更：QRコードを使ってPC名を変更するアイコン">
+      </div>
+    </section>
+
+    <section class="section section-muted" aria-labelledby="features-title">
+      <div class="section-wrap">
+        <p class="eyebrow">できること</p>
+        <h2 id="features-title">実習室の入れ替え作業を、シンプルに。</h2>
+        <div class="feature-grid">
+          <article class="feature-card">
+            <span class="feature-number">01</span>
+            <h3>QRコードで入力</h3>
+            <p>PC名を入力したQRコードをカメラで読み取って、入力の手間を減らします。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-number">02</span>
+            <h3>手入力にも対応</h3>
+            <p>QRコードがない場合は、画面上で新しいPC名を直接入力できます。</p>
+          </article>
+          <article class="feature-card">
+            <span class="feature-number">03</span>
+            <h3>変更履歴を保存</h3>
+            <p>変更前と変更後のPC名を、日時付きのログファイルに記録します。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-to" aria-labelledby="how-to-title">
+      <div class="section-wrap narrow-wrap">
+        <p class="eyebrow">使い方</p>
+        <h2 id="how-to-title">5つの手順で完了</h2>
+        <ol class="steps">
+          <li><span class="step-number">1</span><div><h3>batファイルを起動</h3><p>ダウンロードしたファイルをダブルクリックします。</p></div></li>
+          <li><span class="step-number">2</span><div><h3>確認画面で「はい」</h3><p>管理者アカウントでログインしている場合は、UAC画面で「はい」を押します。</p></div></li>
+          <li><span class="step-number">3</span><div><h3>QRコードを読み取る</h3><p>カメラにPC名のQRコードをかざします。読み取れない場合は手入力に切り替えられます。</p></div></li>
+          <li><span class="step-number">4</span><div><h3>内容を確認して変更</h3><p>現在のPC名と新しいPC名を確認して、変更を実行します。</p></div></li>
+          <li><span class="step-number">5</span><div><h3>PCを再起動</h3><p>変更を完全に反映するため、作業後にPCを再起動します。</p></div></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="permission section-muted" aria-labelledby="permission-title">
+      <div class="section-wrap permission-inner">
+        <div>
+          <p class="eyebrow">権限について</p>
+          <h2 id="permission-title">管理者アカウントなら、<br>「はい」を押すだけ。</h2>
+        </div>
+        <div class="permission-text">
+          <p><strong>管理者アカウントでログイン中：</strong><br>batファイルを起動し、UAC画面で「はい」を押します。</p>
+          <p><strong>標準ユーザーでログイン中：</strong><br>管理者アカウントのユーザー名・パスワードが必要です。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="download section-wrap" id="download" aria-labelledby="download-title">
+      <div class="download-box">
+        <img src="assets/pc-renamer-icon-lp.png" alt="" class="download-icon">
+        <div>
+          <p class="eyebrow">PC名変更</p>
+          <h2 id="download-title">実習室のPC管理を、少しラクに。</h2>
+          <p>Windows向け・インストール不要。ダウンロードしてすぐに使えます。</p>
+        </div>
+        <a class="button button-light" href="../run_renamer_qr.bat" download>ダウンロード</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="section-wrap footer-inner">
+      <span>PC名変更</span>
+      <span>Windows向けツール</span>
+    </div>
+  </footer>
+</body>
+</html>
