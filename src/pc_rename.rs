@@ -4,10 +4,8 @@ use anyhow::{bail, Result};
 pub fn get_current_name() -> Result<String> {
     #[cfg(target_os = "windows")]
     {
-        use windows::Win32::System::SystemInformation::{
-            GetComputerNameExW, COMPUTER_NAME_FORMAT,
-        };
         use windows::core::PWSTR;
+        use windows::Win32::System::SystemInformation::{GetComputerNameExW, COMPUTER_NAME_FORMAT};
 
         // ComputerNameDnsHostname = 1
         const NAME_TYPE: COMPUTER_NAME_FORMAT = COMPUTER_NAME_FORMAT(1i32);
@@ -20,11 +18,7 @@ pub fn get_current_name() -> Result<String> {
 
         let mut buf = vec![0u16; size as usize];
         unsafe {
-            GetComputerNameExW(
-                NAME_TYPE,
-                PWSTR(buf.as_mut_ptr()),
-                &mut size,
-            )?;
+            GetComputerNameExW(NAME_TYPE, PWSTR(buf.as_mut_ptr()), &mut size)?;
         }
         Ok(String::from_utf16_lossy(&buf[..size as usize]))
     }
@@ -44,10 +38,8 @@ pub fn set_computer_name(new_name: &str) -> Result<()> {
 
     #[cfg(target_os = "windows")]
     {
-        use windows::Win32::System::SystemInformation::{
-            SetComputerNameExW, COMPUTER_NAME_FORMAT,
-        };
         use windows::core::PCWSTR;
+        use windows::Win32::System::SystemInformation::{SetComputerNameExW, COMPUTER_NAME_FORMAT};
 
         // ComputerNamePhysicalDnsHostname = 5
         const NAME_TYPE: COMPUTER_NAME_FORMAT = COMPUTER_NAME_FORMAT(5i32);
@@ -88,8 +80,38 @@ fn validate_name(name: &str) -> Result<()> {
             );
         }
     }
+    if !name.chars().any(|ch| ch.is_ascii_alphabetic()) {
+        bail!("PC 名には英字を 1 文字以上含めてください");
+    }
     if name.starts_with('-') || name.ends_with('-') {
         bail!("PC 名の先頭・末尾にハイフンは使用できません");
     }
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::validate_name;
+
+    #[test]
+    fn accepts_valid_pc_names() {
+        for name in ["PC-001", "ROOM-A12", "A", "PC1234567890123"] {
+            assert!(validate_name(name).is_ok(), "{name} should be valid");
+        }
+    }
+
+    #[test]
+    fn rejects_invalid_pc_names() {
+        for name in [
+            "",
+            "12345",
+            "-PC001",
+            "PC001-",
+            "PC_001",
+            "PC NAME",
+            "PC12345678901234",
+        ] {
+            assert!(validate_name(name).is_err(), "{name} should be invalid");
+        }
+    }
 }
