@@ -7,16 +7,15 @@
 - **PC名変更ツール**：QRコードを読み取ってWindowsのPC名を変更します。
 - **PC名QRコード一括作成ツール**：PC名一覧からQRコード画像を一括生成します。
 
-両ツールは`apps/shared`のPC名検証ルールを共有しています。
+両ツールは`crates/pc-name`のPC名検証ルールを共有しています。
 
 ## リポジトリ構成
 
 ```text
 .
-├─ apps/
-│  ├─ pc-renamer/           PC名変更ツール
-│  ├─ qr-batch-generator/   QRコード一括作成ツール
-│  └─ shared/               共通のPC名検証
+├─ src/                         PC名変更ツール
+├─ apps/qr-batch-generator/     QRコード一括作成ツール
+├─ crates/pc-name/              共通のPC名検証
 └─ landing-page/                GitHub Pages用LP
 ```
 

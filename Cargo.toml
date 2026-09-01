@@ -1,7 +1,39 @@
+[package]
+name = "pc_renamer"
+version = "0.1.0"
+edition = "2021"
+description = "Windows PC name changer using QR code / CLI"
+
 [workspace]
-members = ["apps/pc-renamer", "apps/qr-batch-generator", "apps/shared"]
+members = [".", "apps/qr-batch-generator", "crates/pc-name"]
 resolver = "2"
 
 [workspace.dependencies]
 anyhow = "1"
-pc-name = { path = "apps/shared" }
+pc-name = { path = "crates/pc-name" }
+
+[dependencies]
+# CLI argument parsing
+clap = { version = "4", features = ["derive"] }
+dialoguer = "0.11"
+
+# Error handling and shared validation
+anyhow.workspace = true
+pc-name.workspace = true
+chrono = "0.4"
+
+# Camera & QR
+nokhwa = { version = "0.10.6", features = ["input-msmf"] }
+minifb = "0.27"
+rqrr = "0.7"
+image = "0.25"
+
+# Admin permission check
+is_elevated = "0.1"
+
+# Windows API (computer name change)
+[target.'cfg(target_os = "windows")'.dependencies]
+windows = { version = "0.58", features = [
+    "Win32_System_SystemInformation",
+    "Win32_Foundation",
+] }
