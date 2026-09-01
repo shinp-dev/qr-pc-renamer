@@ -21,3 +21,6 @@ Thumbs.db
 
 # Exclude final build folder
 /完成版/
+
+# Node tooling cache/dependencies
+/node_modules/
