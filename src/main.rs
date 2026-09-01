@@ -41,8 +41,8 @@ fn run() -> Result<()> {
     }
 
     // 3. 現在の PC 名を取得
-    let old_name = pc_rename::get_current_name()
-        .context("現在のコンピュータ名の取得に失敗しました")?;
+    let old_name =
+        pc_rename::get_current_name().context("現在のコンピュータ名の取得に失敗しました")?;
 
     println!("\n現在の PC 名 : {}", old_name);
     println!("新しい PC 名 : {}", new_name);
@@ -59,9 +59,12 @@ fn run() -> Result<()> {
         pc_rename::set_computer_name(&new_name)
             .with_context(|| format!("コンピュータ名を '{}' に変更できませんでした", new_name))?;
         println!("✔ コンピュータ名の変更に成功しました");
-        
+
         // 5. ログに追記 (rename.log)
-        log_change(&old_name, &new_name).context("ログの書き込みに失敗しました")?;
+        // PC 名の変更自体は完了しているため、ログ保存の失敗は警告として扱う。
+        if let Err(err) = log_change(&old_name, &new_name) {
+            eprintln!("\n⚠ PC 名の変更には成功しましたが、履歴ログを保存できませんでした: {err:#}");
+        }
     }
 
     // 6. 完了サマリー
@@ -135,8 +138,6 @@ fn manual_input() -> Result<String> {
         .interact_text()?;
     Ok(input.trim().to_string())
 }
-
-
 
 fn log_change(old_name: &str, new_name: &str) -> Result<()> {
     let mut file = OpenOptions::new()
