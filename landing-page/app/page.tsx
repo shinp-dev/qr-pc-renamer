@@ -39,7 +39,7 @@ export default function Home() {
               <li><span className="step-number">2</span><div><h3>作成した画像を確認</h3><p>指定フォルダに、PCごとのQR画像が連番で作成されます。</p></div></li>
               <li><span className="step-number">3</span><div><h3>Google Driveへ入れる</h3><p>作成したQR画像をGoogle Driveの作業用フォルダにアップロードします。</p></div></li>
             </ol>
-            <p className="prep-note">実習時はスマホでQR画像を1枚ずつ表示し、対象PCのカメラにスマホの画面をかざして読み取らせます。</p>
+            <p className="prep-note">PC名変更作業では、スマホでQR画像を1枚ずつ表示し、対象PCのカメラに画面をかざして読み取ります。</p>
           </div>
         </section>
 
