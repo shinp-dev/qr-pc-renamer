@@ -2,8 +2,9 @@ use anyhow::{bail, Context, Result};
 use chrono::Local;
 use clap::Parser;
 use dialoguer::{theme::ColorfulTheme, Input, Select};
-use std::fs::OpenOptions;
+use std::fs::{create_dir_all, OpenOptions};
 use std::io::Write;
+use std::path::PathBuf;
 
 mod pc_rename;
 mod qr_scanner;
@@ -26,21 +27,22 @@ fn main() {
 }
 
 fn run() -> Result<()> {
-    // 1. 管理者権限チェック
-    if !is_elevated::is_elevated() {
+    let cli = Cli::parse();
+
+    // --help / --version は clap がここで処理する。dry-run も管理者権限を要求しない。
+    if !cli.dry_run && !is_elevated::is_elevated() {
         bail!("管理者権限がありません。管理者として実行してください。");
     }
 
-    let cli = Cli::parse();
-
-    // 2. 新しいPC名の取得（引数 > QR/手入力）
+    // 1. 新しいPC名の取得（引数 > QR/手入力）
     let new_name = get_new_name(&cli)?;
 
     if new_name.is_empty() {
         bail!("PC 名が空です。有効な名前を指定してください。");
     }
+    pc_name::validate(&new_name).context("指定されたPC名が有効ではありません")?;
 
-    // 3. 現在の PC 名を取得
+    // 2. 現在の PC 名を取得
     let old_name =
         pc_rename::get_current_name().context("現在のコンピュータ名の取得に失敗しました")?;
 
@@ -51,7 +53,7 @@ fn run() -> Result<()> {
         bail!("新しい PC 名が現在の PC 名と同じです。変更する必要はありません。");
     }
 
-    // 4. コンピュータ名の変更
+    // 3. コンピュータ名の変更
     if cli.dry_run {
         println!("\n[dry-run] コンピュータ名の変更をスキップします。");
     } else {
@@ -60,14 +62,14 @@ fn run() -> Result<()> {
             .with_context(|| format!("コンピュータ名を '{}' に変更できませんでした", new_name))?;
         println!("✔ コンピュータ名の変更に成功しました");
 
-        // 5. ログに追記 (rename.log)
+        // 4. ログに追記
         // PC 名の変更自体は完了しているため、ログ保存の失敗は警告として扱う。
         if let Err(err) = log_change(&old_name, &new_name) {
             eprintln!("\n⚠ PC 名の変更には成功しましたが、履歴ログを保存できませんでした: {err:#}");
         }
     }
 
-    // 6. 完了サマリー
+    // 5. 完了サマリー
     println!("\n==============================");
     println!("  PC 名変更 完了サマリー");
     println!("==============================");
@@ -140,11 +142,44 @@ fn manual_input() -> Result<String> {
 }
 
 fn log_change(old_name: &str, new_name: &str) -> Result<()> {
+    let log_path = log_path()?;
+    if let Some(parent) = log_path.parent() {
+        create_dir_all(parent)?;
+    }
+
     let mut file = OpenOptions::new()
         .create(true)
         .append(true)
-        .open("rename.log")?;
+        .open(&log_path)?;
     let now = Local::now().format("%Y-%m-%d %H:%M:%S");
-    writeln!(file, "[{}] {} -> {}", now, old_name, new_name)?;
+    let user = std::env::var("USERNAME")
+        .or_else(|_| std::env::var("USER"))
+        .unwrap_or_else(|_| "unknown".to_string());
+    writeln!(
+        file,
+        "[{}] {} -> {} | version={} | user={}",
+        now,
+        old_name,
+        new_name,
+        env!("CARGO_PKG_VERSION"),
+        user
+    )?;
     Ok(())
+}
+
+fn log_path() -> Result<PathBuf> {
+    #[cfg(target_os = "windows")]
+    {
+        let program_data =
+            std::env::var_os("ProgramData").context("ProgramDataの保存先を取得できませんでした")?;
+        Ok(PathBuf::from(program_data)
+            .join("ShinpStudio")
+            .join("PcRenamer")
+            .join("rename.log"))
+    }
+
+    #[cfg(not(target_os = "windows"))]
+    {
+        Ok(PathBuf::from("rename.log"))
+    }
 }

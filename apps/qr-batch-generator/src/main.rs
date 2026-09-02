@@ -4,6 +4,7 @@ use imageproc::drawing::{draw_filled_rect_mut, draw_text_mut};
 use imageproc::rect::Rect;
 use qrcode::{EcLevel, QrCode};
 use rusttype::{Font, Scale};
+use std::collections::HashMap;
 use std::ffi::OsStr;
 use std::fs;
 use std::io::{BufRead, BufReader};
@@ -139,6 +140,7 @@ fn run() -> Result<()> {
 fn read_pc_names<R: BufRead>(reader: R) -> Result<Vec<String>> {
     let mut names = Vec::new();
     let mut validation_errors = Vec::new();
+    let mut first_occurrences = HashMap::new();
 
     for (index, line) in reader.lines().enumerate() {
         let line_number = index + 1;
@@ -150,7 +152,17 @@ fn read_pc_names<R: BufRead>(reader: R) -> Result<Vec<String>> {
         }
 
         match pc_name::validate(name) {
-            Ok(()) => names.push(name.to_string()),
+            Ok(()) => {
+                let normalized_name = name.to_ascii_uppercase();
+                if let Some(first_line_number) = first_occurrences.get(&normalized_name) {
+                    validation_errors.push(format!(
+                        "{line_number}行目 [{name}] は{first_line_number}行目と重複しています"
+                    ));
+                } else {
+                    first_occurrences.insert(normalized_name, line_number);
+                    names.push(name.to_string());
+                }
+            }
             Err(err) => validation_errors.push(format!("{line_number} 行目 [{name}]: {err}")),
         }
     }
@@ -236,6 +248,56 @@ mod tests {
         let err = read_pc_names(Cursor::new("PC-001\n12345\nPC-003\n"))
             .expect_err("numeric-only PC name should fail");
         assert!(err.to_string().contains("2 行目 [12345]"));
+    }
+
+    #[test]
+    fn rejects_exact_duplicate_names() {
+        let err = read_pc_names(Cursor::new("PC-001\nROOM-002\nPC-001\n"))
+            .expect_err("exact duplicate PC name should fail");
+        assert!(err
+            .to_string()
+            .contains("3行目 [PC-001] は1行目と重複しています"));
+    }
+
+    #[test]
+    fn rejects_case_insensitive_duplicate_names() {
+        let err = read_pc_names(Cursor::new("PC-001\nroom-002\npc-001\n"))
+            .expect_err("case-insensitive duplicate PC name should fail");
+        assert!(err
+            .to_string()
+            .contains("3行目 [pc-001] は1行目と重複しています"));
+    }
+
+    #[test]
+    fn accepts_non_duplicate_names() {
+        let names = read_pc_names(Cursor::new("PC-001\nroom-002\nPC-003\n"))
+            .expect("non-duplicate PC names should be accepted");
+        assert_eq!(names, ["PC-001", "room-002", "PC-003"]);
+    }
+
+    #[test]
+    fn duplicate_input_does_not_touch_existing_output() {
+        let unique = SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .expect("system clock should be valid")
+            .as_nanos();
+        let test_dir = std::env::temp_dir().join(format!(
+            "qr-batch-generator-duplicate-test-{}-{unique}",
+            std::process::id()
+        ));
+
+        fs::create_dir_all(&test_dir).expect("test directory should be created");
+        let old_qr = test_dir.join("qr_001.png");
+        fs::write(&old_qr, b"old").expect("old QR should be written");
+
+        let result = read_pc_names(Cursor::new("PC-001\npc-001\n"));
+        assert!(result.is_err());
+        assert!(
+            old_qr.exists(),
+            "validation must finish before output cleanup"
+        );
+
+        fs::remove_dir_all(&test_dir).expect("test directory should be removed");
     }
 
     #[test]
