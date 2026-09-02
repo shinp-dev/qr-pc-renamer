@@ -1,0 +1,122 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Windows distribution
+    runs-on: windows-latest
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Check formatting
+        run: cargo fmt --check
+
+      - name: Run Clippy
+        run: cargo clippy --workspace -- -D warnings
+
+      - name: Run tests
+        run: cargo test --workspace
+
+      - name: Build release binaries
+        run: cargo build --workspace --release
+
+      - name: Verify tag matches product version
+        shell: pwsh
+        run: |
+          $metadata = cargo metadata --no-deps --format-version 1 | ConvertFrom-Json
+          $version = ($metadata.packages | Where-Object { $_.name -eq 'pc_renamer' }).version
+          if ("v$version" -ne $env:GITHUB_REF_NAME) {
+            throw "Tag $env:GITHUB_REF_NAME does not match pc_renamer version $version"
+          }
+
+      - name: Assemble distribution ZIP
+        shell: pwsh
+        run: |
+          $staging = Join-Path $env:RUNNER_TEMP 'pc-renamer'
+          New-Item -ItemType Directory -Force -Path $staging | Out-Null
+          Copy-Item 'target\release\pc_renamer.exe' (Join-Path $staging 'pc_renamer.exe')
+          Copy-Item 'run_renamer_qr.bat' (Join-Path $staging 'run_renamer_qr.bat')
+          Compress-Archive -Path (Join-Path $staging '*') -DestinationPath (Join-Path $env:GITHUB_WORKSPACE 'pc-renamer.zip') -Force
+          $hash = (Get-FileHash (Join-Path $env:GITHUB_WORKSPACE 'pc-renamer.zip') -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  pc-renamer.zip" | Set-Content -NoNewline (Join-Path $env:GITHUB_WORKSPACE 'SHA256SUMS.txt')
+
+      - name: Upload release assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: pc-renamer-release-assets
+          path: |
+            pc-renamer.zip
+            SHA256SUMS.txt
+          if-no-files-found: error
+
+  deploy-cloudflare:
+    name: Deploy tagged landing page to Cloudflare
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tagged source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.13.0
+          cache: npm
+          cache-dependency-path: landing-page/package-lock.json
+
+      - name: Install dependencies
+        working-directory: landing-page
+        run: npm ci
+
+      - name: Lint
+        working-directory: landing-page
+        run: npm run lint
+
+      - name: Build
+        working-directory: landing-page
+        run: npm run build
+
+      - name: Deploy to Cloudflare production
+        working-directory: landing-page
+        run: npx --no-install wrangler deploy --config dist/server/wrangler.json
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  create-github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs:
+      - build-windows
+      - deploy-cloudflare
+    steps:
+      - name: Download release assets
+        uses: actions/download-artifact@v4
+        with:
+          name: pc-renamer-release-assets
+          path: release-assets
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            release-assets/pc-renamer.zip
+            release-assets/SHA256SUMS.txt
