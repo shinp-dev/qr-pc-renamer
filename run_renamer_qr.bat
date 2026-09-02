@@ -1,4 +1,5 @@
 @echo off
+setlocal
 chcp 65001 > nul
 cd /d "%~dp0"
 
@@ -6,11 +7,12 @@ cd /d "%~dp0"
 openfiles >nul 2>&1
 if %errorlevel% neq 0 (
     echo 管理者権限で実行し直しています...
-    powershell -NoProfile -ExecutionPolicy Bypass -Command "Start-Process '%~f0' -Verb RunAs"
+    set "RENAME_BAT_PATH=%~f0"
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "$scriptPath = $env:RENAME_BAT_PATH; Start-Process -FilePath $scriptPath -Verb RunAs"
     exit /b
 )
 
-set "EXE_PATH=%~dp0target\release\pc_renamer.exe"
+set "EXE_PATH=%~dp0pc_renamer.exe"
 
 echo ==============================================
 echo 実行ユーザー : %USERNAME% (管理者権限)

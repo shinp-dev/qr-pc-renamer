@@ -1,3 +1,5 @@
+const DOWNLOAD_URL = 'https://github.com/shinp-dev/qr-pc-renamer/releases/latest/download/pc-renamer.zip';
+
 export default function Home() {
   return (
     <>
@@ -12,7 +14,7 @@ export default function Home() {
             <h1>PC名の変更を、<br /><span>もっと手早く。</span></h1>
             <p className="lead">QRコードを読み取るだけで、Windows PCのコンピュータ名を変更できます。読み取り後の修正にも対応した、管理作業向けのシンプルなツールです。</p>
             <div className="hero-actions">
-              <a className="button button-dark" href="/run_renamer_qr.bat" download>配布ファイルをダウンロード</a>
+              <a className="button button-dark" href={DOWNLOAD_URL}>最新版ZIPをダウンロード</a>
               <a className="text-link" href="#how-to">使い方を見る <span aria-hidden="true">↓</span></a>
             </div>
           </div>
@@ -47,8 +49,8 @@ export default function Home() {
           <div className="section-wrap narrow-wrap">
             <p className="eyebrow">PCごとの作業</p><h2 id="how-to-title">スマホのQR画像を使って変更</h2>
             <ol className="steps">
-              <li><span className="step-number">1</span><div><h3>batファイルを起動</h3><p>対象PCでダウンロードしたファイルをダブルクリックします。</p></div></li>
-              <li><span className="step-number">2</span><div><h3>確認画面で「はい」</h3><p>管理者アカウントでログインしている場合は、UAC画面で「はい」を押します。</p></div></li>
+              <li><span className="step-number">1</span><div><h3>ZIPをダウンロードして展開</h3><p>GitHub ReleasesからZIPをダウンロードし、任意の場所へ展開します。</p></div></li>
+              <li><span className="step-number">2</span><div><h3>run_renamer_qr.batを起動</h3><p>展開したフォルダのBATファイルを起動し、UAC画面で「はい」を押します。</p></div></li>
               <li><span className="step-number">3</span><div><h3>Google Driveで次のQR画像を表示</h3><p>スマホで作業対象のQR画像を1枚表示します。</p></div></li>
               <li><span className="step-number">4</span><div><h3>スマホをPCのカメラにかざす</h3><p>表示したQR画像を対象PCのカメラに読み取らせます。うまく読めない場合は手入力に切り替えられます。</p></div></li>
               <li><span className="step-number">5</span><div><h3>内容を確認して変更</h3><p>現在のPC名と新しいPC名を確認して、変更を実行します。</p></div></li>
@@ -58,9 +60,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="permission section-muted" aria-labelledby="permission-title"><div className="section-wrap permission-inner"><div><p className="eyebrow">権限について</p><h2 id="permission-title">管理者アカウントなら、<br />「はい」を押すだけ。</h2></div><div className="permission-text"><p><strong>管理者アカウントでログイン中：</strong><br />batファイルを起動し、UAC画面で「はい」を押します。</p><p><strong>標準ユーザーでログイン中：</strong><br />管理者アカウントのユーザー名・パスワードが必要です。</p></div></div></section>
+        <section className="permission section-muted" aria-labelledby="permission-title"><div className="section-wrap permission-inner"><div><p className="eyebrow">権限について</p><h2 id="permission-title">管理者アカウントなら、<br />「はい」を押すだけ。</h2></div><div className="permission-text"><p><strong>管理者アカウントでログイン中：</strong><br />BATファイルを起動し、UAC画面で「はい」を押します。</p><p><strong>標準ユーザーでログイン中：</strong><br />管理者アカウントのユーザー名・パスワードが必要です。</p><p><strong>注意：</strong><br />Active Directoryドメイン参加PCでは使用できません。</p></div></div></section>
 
-        <section className="download section-wrap" id="download" aria-labelledby="download-title"><div className="download-box"><img src="/assets/pc-renamer-icon-lp.png" alt="" className="download-icon" /><div><p className="eyebrow">PC名変更</p><h2 id="download-title">実習室のPC管理を、少しラクに。</h2><p>Windows向け・インストール不要。ダウンロードしてすぐに使えます。</p></div><a className="button button-light" href="/run_renamer_qr.bat" download>ダウンロード</a></div></section>
+        <section className="download section-wrap" id="download" aria-labelledby="download-title"><div className="download-box"><img src="/assets/pc-renamer-icon-lp.png" alt="" className="download-icon" /><div><p className="eyebrow">PC名変更</p><h2 id="download-title">実習室のPC管理を、少しラクに。</h2><p>最新版のZIPをダウンロードして、展開後にBATファイルを実行してください。</p></div><a className="button button-light" href={DOWNLOAD_URL}>ZIPをダウンロード</a></div></section>
       </main>
       <footer className="site-footer"><div className="section-wrap footer-inner"><span>PC名変更</span><span>Windows向けツール</span></div></footer>
     </>
