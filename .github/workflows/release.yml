@@ -51,6 +51,7 @@ jobs:
           New-Item -ItemType Directory -Force -Path $staging | Out-Null
           Copy-Item 'target\release\pc_renamer.exe' (Join-Path $staging 'pc_renamer.exe')
           Copy-Item 'run_renamer_qr.bat' (Join-Path $staging 'run_renamer_qr.bat')
+          Copy-Item 'target\release\qr-batch-generator.exe' (Join-Path $staging 'qr-batch-generator.exe')
           Compress-Archive -Path (Join-Path $staging '*') -DestinationPath (Join-Path $env:GITHUB_WORKSPACE 'pc-renamer.zip') -Force
           $hash = (Get-FileHash (Join-Path $env:GITHUB_WORKSPACE 'pc-renamer.zip') -Algorithm SHA256).Hash.ToLowerInvariant()
           "$hash  pc-renamer.zip" | Set-Content -NoNewline (Join-Path $env:GITHUB_WORKSPACE 'SHA256SUMS.txt')

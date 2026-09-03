@@ -58,7 +58,7 @@
         <p class="eyebrow">事前準備</p>
         <h2 id="qr-prep-title">先にQR画像をまとめて用意</h2>
         <ol class="steps">
-          <li><span class="step-number">1</span><div><h3>PC名一覧からQR画像を一括作成</h3><p>PC名を1行ずつ入力して、QR一括生成ツールを実行します。</p></div></li>
+          <li><span class="step-number">1</span><div><h3>QR一括生成ツールを実行</h3><p>ZIPに含まれる <code>qr-batch-generator.exe</code> を実行し、作成された <code>input.txt</code> にPC名を1行ずつ入力して、もう一度実行します。</p></div></li>
           <li><span class="step-number">2</span><div><h3>作成した画像を確認</h3><p>指定フォルダに、PCごとのQR画像が連番で作成されます。</p></div></li>
           <li><span class="step-number">3</span><div><h3>Google Driveへ入れる</h3><p>作成したQR画像をGoogle Driveの作業用フォルダにアップロードします。</p></div></li>
         </ol>
@@ -71,7 +71,7 @@
         <p class="eyebrow">PCごとの作業</p>
         <h2 id="how-to-title">スマホのQR画像を使って変更</h2>
         <ol class="steps">
-          <li><span class="step-number">1</span><div><h3>ZIPをダウンロードして展開</h3><p>GitHub ReleasesからZIPをダウンロードし、任意の場所へ展開します。</p></div></li>
+          <li><span class="step-number">1</span><div><h3>ZIPをダウンロードして展開</h3><p>GitHub ReleasesからZIPをダウンロードし、任意の場所へ展開します。PC名変更、起動用BAT、QR一括生成の3ファイルが入っています。</p></div></li>
           <li><span class="step-number">2</span><div><h3>run_renamer_qr.batを起動</h3><p>展開したフォルダのBATファイルを起動し、UAC画面で「はい」を押します。</p></div></li>
           <li><span class="step-number">3</span><div><h3>Google Driveで次のQR画像を表示</h3><p>スマホで作業対象のQR画像を1枚表示します。</p></div></li>
           <li><span class="step-number">4</span><div><h3>スマホをPCのカメラにかざす</h3><p>表示したQR画像を対象PCのカメラに読み取らせます。うまく読めない場合は手入力に切り替えられます。</p></div></li>
