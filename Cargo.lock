@@ -1509,7 +1509,7 @@ version = "0.1.0"
 
 [[package]]
 name = "pc_renamer"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1628,7 +1628,7 @@ dependencies = [
 
 [[package]]
 name = "qr-batch-generator"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "anyhow",
  "image 0.23.14",
